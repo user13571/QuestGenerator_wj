@@ -69,7 +69,7 @@ model.generate 시 괄호 안 옵션을 다양하게 변경하여 문장 생성�
 - ~.bin :
 <br>
 ## 파일 구성
-```bash
+``` bash
 ├── keywordsFolder/
 │   └── KeyList_Fordemo.csv
 ├── models/
