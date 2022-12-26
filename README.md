@@ -4,8 +4,7 @@
 
 ## 문장 생성
 #### 1. git clone 및 패키지 설치
-``` git clone https://github.com/user13571/QuestGenerator_wj.git ``` <br>
-``` pip install -r requirements.txt ```
+``` git clone https://github.com/user13571/QuestGenerator_wj.git ```
 <br>
 #### 2. 모델 다운로드
 모델 용량이 커서 깃허브에 직접 올리기 힘들어 구글 드라이브 링크로 공유합니다. <br>
