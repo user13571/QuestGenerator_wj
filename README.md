@@ -40,15 +40,15 @@ input_sentence의 형식은 모델마다 약간의 차이가 있지만, 기본 �
   -  "[MASK] 도서관[PLACE] [MASK] 책[OBJECT] [MASK] 읽다[VERB]" : 수식어 위주라는 제한을 주지 않고, 모델이 자유롭게 추가적인 단어들을 생성하도록 합니다.
 - (.bin 모델)
   -  말투를 변환시키기 위해, 앞선 입력 앞/뒤에 [STYLE(숫자)] [/STYLE] 토큰을 넣어줍니다. (ex. "[STYLE1] [MASK] 도서관[PLACE] [MASK] 책[OBJECT] 읽다[VERB] [/STYLE]" )
-    - [STYLE1] : 외향형 말
-    - [STYLE2] : 조선시대 왕 말투 
-    - [STYLE3] : 로봇 말투
-    - [STYLE4] : 사극 선비 말투
+      - [STYLE1] : 외향형 말투
+      - [STYLE2] : 조선시대 왕 말투 
+      - [STYLE3] : 로봇 말투
+      - [STYLE4] : 사극 선비 말투
 
 ```python
 result=model.generate(input_ids,num_beams=2, do_sample=True,temperature=1.2, top_p=0.8, max_length=1024, num_return_sequences=1)
 result_sentence=tokenizer.batch_decode(result,skip_special_tokens=True)
-print(result)
+print(result_sentence)
 ```
 model.generate 시 괄호 안 옵션을 다양하게 변경하여 문장 생성을 다양화 할 수 있습니다.
 - 주요 parameter
