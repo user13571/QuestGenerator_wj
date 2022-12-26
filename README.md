@@ -28,7 +28,7 @@ model.load_state_dict(torch.load('./models/모델명.bin',map_location=torch.dev
 model.eval()
 
 ```
-이를 통해 파이썬 내에서 직접 문장 생성을 테스트 할 수도 있습니다.
+폴더 안에 .py 파일을 만들고, 이를 통해 파이썬 내에서 직접 문장 생성을 테스트 할 수도 있습니다.
 ```python
 input_sentence="(~~~)" #예시: "도서관[PLACE] 책[OBJECT] 읽다[VERB]" / "도서관[PLACE] 가다[VERB]"
 input_ids=tokenizer(['[BOS] '+input_sentence+' [EOS]'],return_tensors='pt')['input_ids']
