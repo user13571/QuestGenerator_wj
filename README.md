@@ -45,14 +45,14 @@ input_ids=tokenizer(['[BOS] '+input_sentence+' [EOS]'],return_tensors='pt')['inp
 더 길고 다양한 문장을 만들기 위해 다음과 같은 입력을 넣어줄 수 있습니다. <br>
 - kobart-myModel-positive.bin
   -  ``` [ADNOM] 도서관[PLACE] [ADVERB] 책[OBJECT] 읽다[VERB] ``` : 명사 앞에는 [ADNOM], 동사 앞에는 [ADVERB]을 넣어주어 모델이 원하는 문장의 의도를 크게 벗어나지 않게, 수식어(관형어/부사어) 위주로 생성하게 합니다.
-- kobart-myModel-base.bin
-  - ``` [STYLE1] [MASK] 도서관[PLACE] [MASK] 책[OBJECT] 읽다[VERB] [/STYLE] ``` 말투를 변환시키기 위해, 앞선 입력 앞/뒤에 [STYLE(숫자)] [/STYLE] 토큰을 넣을 수 있습니다.
-      - [STYLE1] : 외향형 말투 *생성 예시: *
-      - [STYLE2] : 조선시대 왕 말투
-      - [STYLE3] : 로봇 말투
-      - [STYLE4] : 사극 선비 말투
-- 공통
+- 모델 공통
   -  ``` [MASK] 도서관[PLACE] [MASK] 책[OBJECT] [MASK] 읽다[VERB] ``` : 수식어 위주라는 제한을 주지 않고, 모델이 자유롭게 추가적인 단어들을 생성하도록 합니다. 사이에 있는 [MASK]의 개수를 여러개로 늘리면 더 긴 문장이 생길 가능성이 커집니다.
+- kobart-myModel-base.bin
+  - 말투를 변환시키기 위해, 앞선 입력 앞/뒤에 [STYLE(숫자)] [/STYLE] 토큰을 넣을 수 있습니다.
+      - [STYLE1] : 외향형 말투 ``` 생성 결과 예시: 헐!! 쥐라기 파크에서 공룡을 보자~! / 이번엔 미술관에서 그림을 보여줄래! /... ```
+      - [STYLE2] : 조선시대 왕 말투 ``` 생성 결과 예시: 지금 쥐라기 파크에서 공룡을 보려 하오. / 과인은 미술관에 가서 그림을 보려네. /... ```
+      - [STYLE3] : 로봇 말투 ``` 생성 결과 예시: 미술관. 관람. 그림. 감상. 놀이. / 쥐라기 파크. 공룡. 보았는가. /... ```
+      - [STYLE4] : 사극 선비 말투 ``` 생성 결과 예시: 그렇소! 오늘밤에도 이 도서관에서 읽고 싶은 책을 읽어 보시오! / 소생은 지금 도서관에 있는 책을 읽고 있소! / 그렇다면 쥐라기 파크에서 공룡을 보는 것이오! / ... ```
  
 ```python
 result=model.generate(input_ids,num_beams=2, do_sample=True,temperature=1.2, top_p=0.8, max_length=1024, num_return_sequences=1)
