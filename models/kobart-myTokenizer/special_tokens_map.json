@@ -1,0 +1,1 @@
+{"bos_token": "[BOS]", "eos_token": "[EOS]", "unk_token": "[UNK]", "sep_token": "[SEP]", "pad_token": "[PAD]", "mask_token": "[MASK]", "additional_token": [ "[PLACE]", "[VERB]","[OBJECT]", "[STYLE1]", "[STYLE2]", "[STYLE3]", "[STYLE4]", "[/STYLE]", "[ADNOM]", "[ADVERB]"]}

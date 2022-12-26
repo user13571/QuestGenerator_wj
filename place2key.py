@@ -41,19 +41,3 @@ def return_keys_random(place):
     k.append('0')
     return k
 
-def return_adds(place):
-    add_base=['재미있는게 많#','즐거#','놀기 좋#','좋#','멋지#', '같이 #']
-    add_more=[]
-    if place=='교실':
-        add_more=['즐거운']
-    elif place=='쥐라기 파크':
-        add_more=['멋진 공룡이 있#']
-    elif place=='도서관':
-        add_more=['# 책이 많#','# 이야기가 가득#', '흥미진진#', '# 책을 읽#']
-    elif place=='갤러리':
-        add_more=['# 그림이 있#','# 이야기가 #', '흥미진진#','멋진 그림을 보#']
-
-    add_base.extend(add_more)
-    return add_base
-
-## (raw + add) & action_original 돌려줌
