@@ -1,13 +1,9 @@
 from flask import Flask, request, render_template
 from transformers import BartForConditionalGeneration, BartTokenizer
 from transformers import BartConfig
-from konlpy.tag import Komoran
-from soylemma import Lemmatizer
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import json
-from place2key import return_keys_random, return_adds
-from key2sent_base import quest_generate_strict
-from key2sent_add import description_gen
+from place2key import return_keys_random
 import torch
 app = Flask(__name__)
 
