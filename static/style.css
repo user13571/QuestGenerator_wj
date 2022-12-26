@@ -1,0 +1,12 @@
+.unused{
+    visibility: hidden;
+}
+.blue{
+    color: blue;
+}
+#r{
+    height: 500px;
+}
+#result{
+    overflow: auto;
+}
