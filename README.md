@@ -37,7 +37,7 @@ input_sentence="(문장)" #예시: "도서관[PLACE] 책[OBJECT] 읽다[VERB]" /
 input_ids=tokenizer(['[BOS] '+input_sentence+' [EOS]'],return_tensors='pt')['input_ids']
 ```
 기본 문장 구조를 만드는 input_sentence의 구조는 ``` 장소[PLACE] 대상[OBJECT] 행동[VERB] ``` 입니다. <br>
-> 연관이 있는 장소/대상/행동, 데이터가 많은 단어를 넣어주면 더 자연스러운 문장이 생성됩니다
+> 연관이 있는 장소/대상/행동, 데이터가 많은 단어를 넣어주면 더 자연스러운 문장이 생성됩니다. <br>
 더 길고 다양한 문장을 만들기 위해 다음과 같은 입력을 넣어줄 수 있습니다. <br>
 - kobart-myModel-positive.bin
   -  ``` [ADNOM] 도서관[PLACE] [ADVERB] 책[OBJECT] 읽다[VERB] ``` : 명사 앞에는 [ADNOM], 동사 앞에는 [ADVERB]을 넣어주어 모델이 원하는 문장의 의도를 크게 벗어나지 않게, 수식어(관형어/부사어) 위주로 생성하게 합니다.
@@ -69,7 +69,7 @@ model.generate 시 괄호 안 옵션을 다양하게 변경하여 문장 생성�
 ├── keywordsFolder/
 │   └── KeyList_Fordemo.csv
 ├── models/
-│   └── tok/
+│   └── kobart-myTokenizer/
 ├── static/
 │   ├── script.js
 │   └── style.css
