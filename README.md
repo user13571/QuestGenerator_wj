@@ -46,14 +46,23 @@ input_sentence의 형식은 모델마다 약간의 차이가 있지만, 기본 �
     - [STYLE4] : 사극 선비 말투
 
 ```python
-result=model.generate(input_ids,num_beams=2,no_repeat_ngram_size=3, do_sample=True,temperature=1.5, top_p=0.8, max_length=1024, num_return_sequences=1)
-result_sentence=tokenizer.batch_decode(result,skip_special_tokens=True)[0]
+result=model.generate(input_ids,num_beams=2, do_sample=True,temperature=1.2, top_p=0.8, max_length=1024, num_return_sequences=1)
+result_sentence=tokenizer.batch_decode(result,skip_special_tokens=True)
 print(result)
 ```
-model.generate 시 다양한 옵션을 주어 문장 생성을 다양화 할 수 있습니다.
+model.generate 시 괄호 안 옵션을 다양하게 변경하여 문장 생성을 다양화 할 수 있습니다.
 - 주요 parameter
-  -  temperature : 1이 기본값, 1보다 클 수록 창의적인(혹은 말이 안될 수도 있는) 문장을 생성합니다
-  -  
+  -  do_sample : False면 greedy, True면 sampling을 해서(top-p 혹은 top-k 설정) decoding 합니다. sampling을 하면 더 자연스러운 문장이 생깁니다.
+  -  num_beams : 클수록 문장이 자연스럽고 무난해(?)집니다.
+  -  temperature : 1이 기본값, 1보다 클 수록 창의적이고 다양한 (혹은 말이 안될 수도 있는) 문장을 생성합니다.
+  -  num_return_sequences : 생성되는 문장 개수입니다.
+  -  no_repeat_ngram_size : 이 단위로 반복되는 어구를 만들지 않습니다.
 
 #### 5. (옵션) gen.py를 통한 생성
-``` python gen.py --model-name (모델명.bin) --place (장소) --object (대상) --action (행동) --gen-num (생성개수) (... 기타 옵션 ...(ex. --do-sample / --top-p / --top-k : 앞서 설명한 것과 동일) ) ``` 을 통해 디코딩 옵션을 바꿔 생성할 수도 있습니다. output 폴더에 csv 파일로 저장이 됩니다.
+``` python gen.py --model-name (모델명.bin) --place (장소) --object (대상) --action (행동) --gen-num (생성개수) (... 기타 옵션 ...(ex. --do-sample / --top-p / --top-k : 앞서 설명한 것과 동일) ) ``` 을 통해 생성할 수도 있습니다. output 폴더에 키워드, 옵션, 문장 쌍이 csv 파일로 저장이 됩니다.
+
+## 모델 설명
+> 총 ~개의 모델이 있습니다.
+- ~.bin : 
+- ~.bin :
+- ~.bin :
