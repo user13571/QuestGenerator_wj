@@ -1,55 +1,105 @@
-$(document).ready(function(){
-    let genNum=0;
-    $('.send').click(function(e){
-        let keyInfo={};
-        let key_n=document.getElementsByClassName('k');
-        let key_name=document.getElementsByClassName('kn');
+const decodeSelect = (target) => {
+    let opt1=document.getElementById("optSelect");
+    if (target.value==="opt_greedy"){
+        opt1.innerHTML='<td class="opt_n">do_sample</td><td><input style="width: 5em;" class="opt_v" type="text" value="" placeholder="False" disabled></td>';
+    }
+    else if (target.value==="opt_beam"){
+        opt1.innerHTML= '<td class="opt_n">do_sample</td><td><input type="text" placeholder="False" value="" class="opt_v" style="width: 5em;" disabled></td>\
+<td class="opt_n">num_beams</td><td><input type="number" class="opt_v"  style="width: 5em;" value="3"></td>';
+    }
+    else{
+        opt1.innerHTML= '<td class="opt_n">do_sample</td><td><input class="opt_v" type="text" value="True" style="width: 5em;" disabled></td>\
+<td class="opt_n">top_k</td><td><input class="opt_v" type="number" style="width: 5em;" value="10"></td>\
+<td class="opt_n">top_p</td><td><input class="opt_v" type="number" style="width: 5em;" value="0.9"></td>';
+    }
+}
 
-        keyInfo={
-            'k_place_modify': '0',
-            'k_location': '0',
-            'k_time': '0',
-            'k_add': '0',
-        }
+const getOptionVal = () => {
+    let optionList={};
+    let opt_name=document.getElementsByClassName("opt_n");
+    let opt_val=document.getElementsByClassName("opt_v");
+    for (let i=0; i<opt_name.length ; i++){
+        optionList[opt_name[i]]=opt_val[i];
+    }
+    return optionList;
+}
 
-        for (let i=0; i<key_n.length ; i++) {
-            let tmp='k_'+((key_name[i].innerText.split('/')[0]).toLowerCase());
-            keyInfo[tmp]=key_n[i].value;
-        }
+model_loaded=0;
+async function loadModel() {
+    let model=documents.getElementById("type_model");
+    if (model.value==="model_1") {
 
-        let id=e.target.getAttribute('id')
+    }
+    else if (model.value=="model_2"){
 
-        if (id==='send1'){
-            keyInfo['option']=1;
-        }
-        else if (id==='send2'){
-            keyInfo['option']=2;
-        }
-        else if (id==='send3'){
-            keyInfo['option']=3;
-        }
-        else if (id==='send4'){
-            keyInfo['option']=4;
-        }
+    }
+    model_loaded=1;
+}
 
-        info=keyInfo
-        keyInfo=JSON.stringify(keyInfo);
-        console.log(keyInfo);
-        $.ajax({
-			type:'post',   //post 방식으로 전송
-			url: '/quest_gen_web',
-			data: keyInfo,
-            contentType:'application/json',
-            dataType: 'text',
-			success : function(data){                
-                let newRow2=document.getElementById('result').insertRow(0);
-                newRow2.classList.add('sent');
-                newRow2.innerHTML=`<td class="s_" id="sent_${genNum}"></td>`;
-                console.log(data);
-			},
-            error : function(){
-				console.log("getSentence_fail");
-			}
-		});
-    })
-});
+const getTypeVal = () => {
+    const quest_type=document.getElementById('type_quest');
+    const style_type=document.getElementById('type_style');
+    const place=document.getElementById('k_place').value;
+    const obj=document.getElementById('k_object').value;
+    const act=document.getElementById('k_action').value;
+    
+    let c1="";
+    let c2="";
+    let c3="";
+
+    let o1="";
+    let o2="";
+    let o3="";
+
+    if (place!=""){
+        c1=`${place}[PLACE] `;
+        o1='[ADNOM] ';
+    }
+    if (obj!=""){
+        c2=`${obj}[OBJECT] `;
+        o2='[ADNOM] ';
+    }
+    if (act!=""){
+        c3=`${act}[VERB] `;
+        o3='[ADVERB] ';
+    }
+
+    let input="";
+    if (quest_type.value=="quest_2_free"){
+        o1=o2=o3='[MASK][MASK] ';
+    }
+    else if (quest_type.value=="quest_2_long"){
+        o1=o2=o3='[MASK][MASK][MASK][MASK] ';
+    }
+    input=o1+c1+o3+o2+c2+c3;
+
+    sentence=""
+    if (style_type.value==="style_2_enfp")
+        sentence='[STYLE1] '+input+' [/STYLE]';
+    else if (style_type.value==="style_3_oldKing")
+        sentence='[STYLE2] '+input+' [/STYLE]';        
+    else if (style_type.value==="style_4_robot")
+        sentence='[STYLE3] '+input+' [/STYLE]';
+    else if (style_type.value==="style_5_old")
+        sentence='[STYLE4] '+input+' [/STYLE]';
+    return sentence;
+}
+
+async function makeSentence(){
+    if (model_loaded===0){
+        await loadModel();
+    }
+    let optionList=getOptionVal();
+    let input=getTypeVal();
+    optionList['input_sentence']=input;
+    const responce = await fetch('/quest_gen_web', {
+        method: 'POST',
+        body: JSON.stringify(optionList),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const result=await responce.json();
+    const newSent=document.getElementById('result').insertRow(0);
+    newSent.innerHTML=result;
+}

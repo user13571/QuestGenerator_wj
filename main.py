@@ -14,8 +14,8 @@ from transformers import BartConfig
 config=BartConfig.from_pretrained("./models/kobart-myTokenizer")
 model = BartForConditionalGeneration(config=config)
 
-model.load_state_dict(torch.load('./models/kobart-myModel-positive.bin',map_location=torch.device('cpu')))
-model.eval()
+# model.load_state_dict(torch.load('./models/kobart-myModel-positive.bin',map_location=torch.device('cpu')))
+# model.eval()
 
 
 @app.route('/quest_gen',methods=['GET','POST'])
@@ -31,7 +31,7 @@ def quest_gen():
         print(sent)
         
         input_ids=tok([sent],return_tensors='pt')['input_ids']
-        sent=tok.batch_decode(style_model.generate(input_ids, do_sample=True, top_p=0.6, max_length=1024, num_return_sequences=1),skip_special_tokens=True)[0]
+        sent=tok.batch_decode(style_model.generate(input_ids, do_sample=True, top_p=0.6, max_length=1024),skip_special_tokens=True)[0]
         print(sent)
         data={
             'sentence':sent,
@@ -49,34 +49,31 @@ def home():
 def quest_gen_web():
     if request.method=='POST':
         content=request.get_json(silent=True)
-        sent=input_gen(content['k_place'],content['k_object'],content['k_action'],content['option'])
-        input_ids=tok([sent],return_tensors='pt')['input_ids']
-        sent=tok.batch_decode(model.generate(input_ids,num_beams=2,no_repeat_ngram_size=3, do_sample=True,temperature=1.2, top_p=0.9, max_length=1024, num_return_sequences=1),skip_special_tokens=True)[0]
+        input_sentence=content['input_sentence']
+        sent=sentence_generate(input_sentence, content)
         return sent
 
-def input_gen(place, obj, action, opt):
-    sent=""
-    if opt==1:
-        if obj!='':
-            sent=f'[BOS] [ADNOM] {place}[PLACE] [ADVERB] [ADNOM] {obj}[OBJECT] {action}[VERB] [EOS]'
+def sentence_generate(sent, content){
+    input_ids=tok(['[BOS] '+sent+' [EOS]'],return_tensors='pt')['input_ids']
+    opt_int=['num_return_sequences','num_beams','no_repeat_ngam_size','top_k','min_length']
+    opt_float=['','','']
+    opt_bool=['do_sample']
+    opt_str=['']
+    optionList={}
+    for k,v in content.items():
+        if k in opt_int:
+            optionList[k]=int(v)
+        elif k in opt_bool:
+            optionList[k]=bool(v)
+        elif k in opt_str:
+            optionList[k]=str(v)
         else:
-            sent=f'[BOS] [ADNOM] {place}[PLACE] [ADVERB] {action}[VERB] [EOS]'
-    elif opt==2:
-        if obj!='':
-            sent=f'[BOS] [STYLE1] [ADNOM] {place}[PLACE] [ADVERB] [ADNOM] {obj}[OBJECT] {action}[VERB] [/STYLE] [EOS]'
-        else:
-            sent=f'[BOS] [STYLE1] [ADNOM] {place}[PLACE] [ADVERB] {action}[VERB] [/STYLE] [EOS]'
-    elif opt==3:
-        if obj!='':
-            sent=f'[BOS] [STYLE1] [MASK][MASK][MASK] {place}[PLACE] [MASK][MASK][MASK] {obj}[OBJECT] {action}[VERB] [/STYLE] [EOS]'
-        else:
-            sent=f'[BOS] [STYLE1] [MASK][MASK][MASK] {place}[PLACE] [MASK][MASK][MASK] {action}[VERB] [/STYLE] [EOS]'
-    else:
-        if obj!='':
-            sent=f'[BOS] [STYLE2] [MASK][MASK][MASK] {place}[PLACE] [MASK][MASK][MASK] {obj}[OBJECT] {action}[VERB] [/STYLE] [EOS]'
-        else:
-            sent=f'[BOS] [STYLE2] [MASK][MASK][MASK] {place}[PLACE] [MASK][MASK][MASK] {action}[VERB] [/STYLE] [EOS]'
+            optionList[k]=v
+    gen=model.generate(input_ids, **optionList)
+    sent=tok.batch_decode(gen,skip_special_tokens=True)
+    print(sent)
     return sent
+}
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port = 5000)

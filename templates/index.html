@@ -12,30 +12,65 @@
     <div class="container h-100 bg-light">
         <br>
         <h1 class="fw-bold">퀘스트 생성 데모</h1>
-        <div>
-            <table id="k_input" class="table-primary table table-striped">
-                <th>
-                    <tr>
-                        <td class="kn">Place/장소</td><td><input class='k' id="k_place"></td></td>
-                    </tr>
-                    <tr><td class="kn">Object/대상</td><td><input class='k' id="k_object"></td><td class="kn">Action/행동</td><td><input class='k' id="k_action"></td></tr>
-                    <tr>
-                        <td>기본 퀘스트 - 기본 말투</td><td><button class="send" id="send1">Click!</button></td><td>기본 퀘스트 - 외향형 말투</td><td><button class="send" id="send2">Click!</button></td>
-                    </tr>
-                    <tr>
-                        <td>자유로운 퀘스트 - 외향형 말투</td><td><button class="send" id="send3">Click!</button></td><td>자유로운 퀘스트 - 사극 말투</td><td><button class="send" id="send4">Click!</button></td>
-                    </tr> 
-                </th>
-            </table> 
-            <div id="r">
-                <div id="rrrr"></div>
-                <table id="result" class="table table-striped table-light"> 
-                    <th></th>
-                </table>
-            </div>
-        </div>
+        <table class="table-primary table table-striped">
+            <th>키워드</th>
+            <tr>
+                <td class="kn">Place/장소</td> <td><input class='k' id="k_place"></td>
+                <td></td> <td></td>
+            </tr>
+            <tr><td class="kn">Object/대상</td> <td><input class='k' id="k_object"></td>
+                <td class="kn">Action/행동</td> <td><input class='k' id="k_action"></td></tr>
+        </table> 
+        <table class="table-secondary table small table-striped">
+            <tr>
+                <td style="width: 8em;">디코딩 옵션</td><td style="width: 8em;">
+                    <select name="opt_decoding" onchange="decodeSelect(this)" class="w-100">
+                        <option value="opt_1_greedy">Greedy</option>
+                        <option value="opt_2_beam">Beam Search</option>
+                        <option value="opt_3_sampling" selected>Sampling</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <div id="optSelect">
+                    <td class="opt_n">do_sample</td><td><input class="opt_v" type="text" value="True" style="width: 5em;" disabled></td>
+                    <td class="opt_n">top_k</td><td><input class="opt_v" type="number" style="width: 5em;" value="10"></td>
+                    <td class="opt_n">top_p</td><td><input class="opt_v" type="number" style="width: 5em;" value="0.9"></td>
+                </div>
+                <td class="opt_n">repetition_penalty</td><td><input class="opt_v" type="number" style="width: 5em;" value="1.1"></td>
+                <td class="opt_n">no_repeat_ngram_size</td><td><input class="opt_v" type="number" style="width: 5em;" value="3"></td>
+                <td class="opt_n">temperature</td><td><input class="opt_v" type="number" style="width: 5em;" value="1.1"></td>
+                <td class="opt_n">min_length</td><td><input class="opt_v" type="number" style="width: 5em;" value="7"></td>
+            </tr>
+        </table>
+        <table class="table-primary table table-striped">
+            <tr>
+                <td>모델 종류 선택</td>
+                <td><select id="type_model" class="type" name="opt_model" class="w-100">
+                    <option value="model_1">기본</option>
+                    <option value="model_2">긍정</option>
+                </select></td>
+                <td><button id="loadModel" onclick="loadModel()">로드하기</button></td>
+                <td>퀘스트 종류 선택</td>
+                <td><select id="type_quest" class="type" name="opt_quest" class="w-100">
+                    <option value="quest_1_strict">기본</option>
+                    <option value="quest_2_free">자유</option>
+                    <option value="quest_2_long">자유 - 더 길게</option>
+                </select></td>
+                <td>말투 선택</td>
+                <td><select id="type_style" class="type" name="opt_style" class="w-100">
+                    <option value="style_1_none">일반</option>
+                    <option value="style_2_enfp">외향형</option>
+                    <option value="style_3_oldKing">조선시대 왕</option>
+                    <option value="style_4_robot">로봇</option>
+                    <option value="style_5_old">사극 선비</option>
+                </select></td>
+                <td><button class="send" onclick="makeSentence()" >문장 생성하기</button></td>
+            </tr>
+        </table>
+        <table id="result" class="table table-striped table-light"> 
+        </table>
     </div>
 </body>
-<script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="{{url_for('static',filename='script.js')}}"></script>
 </html>
