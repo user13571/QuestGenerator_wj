@@ -4,12 +4,21 @@
 
 ## 문장 생성 - 웹 데모
 http://52.78.11.226:5000
-하단의 별도의 설치 과정 없이, 위 링크로 접속하여 실행할 수 있습니다.
+하단의 별도의 설치 과정 없이, 위 링크로 접속하여 실행할 수 있습니다.<br>
+장소, 대상, 행동을 입력하고 디코딩 옵션을 선택한 뒤, 모델과 퀘스트 종류를 선택한 뒤 생성 버튼을 누릅니다.
+##### 옵션 설명
+- Greedy나 num_beams로 설정 시, 늘 가장 확률이 높다고 생각되는 똑같은 문장만 생깁니다.
+- Sampling을 하면 매번 다른 문장이 생성됩니다. top_k는 정수, top_p는 0~1 사이 실수로 설정합니다.
+- temperature가 1보다 작아지면 비슷한 문장들이, 커지면 더 다양한 문장들이 나옵니다.
+
+##### 모델 종류
+- 기본: huggingFace의 cosmoquester/base-ko-base 모델을 base 모델로 하여(https://huggingface.co/cosmoquester/bart-ko-base), 국립국어원 모두의 말뭉치 구어 데이터셋(https://corpus.korean.go.kr), smile gate 말투 데이터셋(https://smilegate.ai/2022/06/24/smilestyle/), 깃허브 한국어 발화의도 데이터셋(https://github.com/warnikchow/3i4k)을 이용하여 일반적인 문장들에 대하여 조사 생성, 말투 변환, 단어 생성 등을 학습시킨 모델입니다.
+- 긍정:  어린이용 퀘스트에 적합하도록, 위 말뭉치 데이터에 임의로 긍정적인 단어를 추가하고 긍정적인 수식어 위주로 모델을 학습시킨 것으로, 말투 변환 기능은 없습니다.
 ### 링크가 잘 작동하지 않을 때 - 직접 설치 및 실행
 #### 1. git clone 및 패키지 설치
 ``` git clone https://github.com/user13571/QuestGenerator_wj.git ```
 ```
-pip install transformers
+pip install transformers==4.24
 pip install flask
 pip install torch
 ```
@@ -17,59 +26,37 @@ pip install torch
 모델 용량이 커서 깃허브에 직접 올리기 힘들어 구글 드라이브 링크로 공유합니다. <br>
 다운로드 받은 .bin 파일을 models 폴더에 넣으면 됩니다.<br>
 https://drive.google.com/drive/folders/1Cf7Fa7CUcEL4BbtH2hTf-Iojyd3kEvst?usp=share_link
-#### 모델
-> 현재 다음과 같은 모델들이 있습니다.
-- kobart-myModel-base.bin
-  - 국립국어원 모두의 말뭉치 구어 데이터셋, smile gate 말투 데이터셋, 깃허브 한국어 발화의도 데이터셋을 이용하여 일반적인 문장들에 대하여 조사 생성, 말투 변환, 단어 생성 등을 학습시킨 모델입니다.
-- kobart-myModel-positive.bin
-  - 어린이용 퀘스트에 적합하도록, 말뭉치 데이터에 임의로 긍정적인 단어를 추가하고 긍정적인 수식어 위주로 모델을 학습시킨 것으로, 외향형 말투만 생성합니다.
-#### 3. (옵션) 데모 사이트를 통한 생성
-``` python main.py ``` : 퀘스트를 생성할 수 있는 데모 사이트가 열립니다. 유니티에서 서버 주소로 request를 보낼 시 output을 돌려주는 기능도 동시에 실행됩니다. (place2key, keywordsFolder의 keyList 파일이 유니티 데모에 필요한 파일입니다)
-> 데모 사이트 접속 뒤, UI 표시대로 장소, 대상, 행동('-다'(가다, 하다...) 형태의 기본형)을 입력하고 원하는 생성 방식을 선택하면 됩니다.
-#### 4. (옵션) 파이썬 코드 내에서 직접 생성
-```python
-from transformers import AutoTokenizer, BartConfig, BartForConditionalGeneration
-import torch
 
-tokenizer = AutoTokenizer.from_pretrained("./models/kobart-myTokenizer")
-config=BartConfig.from_pretrained("./models/kobart-myTokenizer")
-model = BartForConditionalGeneration(config=config)
-model.load_state_dict(torch.load('./models/모델명.bin',map_location=torch.device('cpu')))
-model.eval()
+#### 3. 폴더 경로에서 ```python main.py``` 실행
 
-```
-레포지토리 안에 .py 파일을 만들고, 이를 통해 파이썬 내에서 직접 문장 생성을 테스트 할 수도 있습니다.
-```python
-input_sentence="(문장)" #예시: "도서관[PLACE] 책[OBJECT] 읽다[VERB]" / "도서관[PLACE] 가다[VERB]"
-input_ids=tokenizer(['[BOS] '+input_sentence+' [EOS]'],return_tensors='pt')['input_ids']
-```
-기본 문장 구조를 만드는 input_sentence의 구조는 ``` 장소[PLACE] 대상[OBJECT] 행동[VERB] ``` 입니다. <br>
-> 연관이 있는 장소/대상/행동, 데이터가 많은 단어를 넣어주면 더 자연스러운 문장이 생성됩니다. <br>
-더 길고 다양한 문장을 만들기 위해 다음과 같은 입력을 넣어줄 수 있습니다. <br>
-- kobart-myModel-positive.bin
-  -  ``` [ADNOM] 도서관[PLACE] [ADVERB] 책[OBJECT] 읽다[VERB] ``` : 명사 앞에는 [ADNOM], 동사 앞에는 [ADVERB]을 넣어주어 모델이 원하는 문장의 의도를 크게 벗어나지 않게, 수식어(관형어/부사어) 위주로 생성하게 합니다.
-- 모델 공통
-  -  ``` [MASK] 도서관[PLACE] [MASK] 책[OBJECT] [MASK] 읽다[VERB] ``` : 수식어 위주라는 제한을 주지 않고, 모델이 자유롭게 추가적인 단어들을 생성하도록 합니다. 사이에 있는 [MASK]의 개수를 여러개로 늘리면 더 긴 문장이 생길 가능성이 커집니다.
-- kobart-myModel-base.bin
-  - ``` [STYLE1] ... [/STYLE] ``` 말투를 변환시키기 위해, 앞선 입력 앞/뒤에 [STYLE(숫자)] [/STYLE] 토큰을 함께 넣고 문장을 생성할 수 있습니다.
-      - [STYLE1] : 외향형 말투 ``` 생성 결과 예시: 헐!! 쥐라기 파크에서 공룡을 보자~! / 이번엔 미술관에서 그림을 보여줄래! /... ```
-      - [STYLE2] : 조선시대 왕 말투 ``` 생성 결과 예시: 지금 쥐라기 파크에서 공룡을 보려 하오. / 과인은 미술관에 가서 그림을 보려네. /... ```
-      - [STYLE3] : 로봇 말투 ``` 생성 결과 예시: 미술관. 관람. 그림. 감상. 놀이. / 쥐라기 파크. 공룡. 보았는가. /... ```
-      - [STYLE4] : 사극 선비 말투 ``` 생성 결과 예시: 그렇소! 오늘밤에도 이 도서관에서 읽고 싶은 책을 읽어 보시오! / 소생은 지금 도서관에 있는 책을 읽고 있소! / 그렇다면 쥐라기 파크에서 공룡을 보는 것이오! / ... ```
- 
-```python
-result=model.generate(input_ids,num_beams=2, do_sample=True,temperature=1.2, top_p=0.8, max_length=1024, num_return_sequences=10)
-result_sentence=tokenizer.batch_decode(result,skip_special_tokens=True)
-print(result_sentence)
-```
-model.generate 시 괄호 안 옵션을 다양하게 변경하여 문장 생성을 다양화 할 수 있습니다.
-- 주요 parameter
-  -  do_sample : False면 greedy, True면 sampling을 해서(top-p 혹은 top-k 설정) decoding 합니다. sampling을 하면 더 자연스러운 문장이 생깁니다.
-  -  num_beams : 클수록 속도는 느려지지만 문장이 자연스러워집니다.
-  -  temperature : 1이 기본값, 1보다 클 수록 창의적이고 다양한 (혹은 말이 안될 수도 있는) 문장을 생성합니다.
-  -  num_return_sequences : 생성되는 문장 개수입니다.
-  -  no_repeat_ngram_size : 이 단위로 반복되는 어구를 만들지 않습니다.
-
+## 개발과정
+### 4~5월: 선행 학습
+- 딥러닝 관련 공부
+- 주제 선정, 개발 환경 세팅
+### 6~8월: 하계집중학습
+- Quest Generator 개발 시작
+    - 장소, 대상, 행동 등 특정 키워드를 제시하면 그에 맞는 퀘스트 문장을 생성해주는 모델
+- 자연어처리 모델 공부
+    - BERT, GPT, BART, T5 등
+- CBART(Xingwei He, Parallel Refinements for Lexically Constrained Text Generation with BART, 2021 / https://github.com/NLPCode/CBART) 논문 조사 및 영어 모델 fine-tuning
+    - 영어 퀘스트 데이터, 영미권 어린이 및 청소년 권장 도서 추출 데이터 이용
+    - 뉴스 데이터, 식당 리뷰 데이터 이용한 원 모델보다 더 나은 생성 결과 확인
+- 한국어 모델 훈련
+    - koBART 이용
+    - 단어 사이사이에 모델이 반복적으로 새 단어를 추가하도록 하여 문장 생성
+        - 키워드에 붙는 조사, 어미 등은 룰베이스로 바꿔줌
+        - 의도와 벗어난 문장을 막기 위해 특정 단어(즐거운, 재밌는 등) 임의로 추가해줌
+    - 어느정도 다양하고 의도에 맞는 퀘스트 문장 생성됨
+### 9~12월: 
+- 문장 말투 변환 모델 학습
+    - smile gate 말투 데이터셋 이용, 문장의 말투를 외향형/반말/사극체 등으로 변환해주는 모델 훈련
+- 어미/조사 변환 딥러닝 모델 등 학습
+    - 기존에 룰베이스로 바꿔주던 부분을 Masking 등을 통해 학습시켜 딥러닝으로 대체
+- 다양한 변환 모델을 하나의 모델로 합침
+    - 모델에 새로운 토큰을 학습시켜 원하는 의도에 맞게 새로운 단어가 생성되도록 함
+- 웹에서 장소 관련된 문장 데이터 크롤링
+    - 네이버 블로그 글들을 크롤링하여 도서관, 쥐라기 파크 등 장소 관련 특수한 문장들 추출
+    - 모델 훈련에 따로 이 데이터를 사용하지는 않음
 
 ## 파일 구성
 ```bash
