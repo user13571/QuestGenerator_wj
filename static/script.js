@@ -27,12 +27,27 @@ const getOptionVal = () => {
 model_loaded=0;
 async function loadModel() {
     let model=documents.getElementById("type_model");
+    let path=''
     if (model.value==="model_1") {
-
+        path='./models/kobart_model_1.bin'
     }
     else if (model.value=="model_2"){
-
+        path='./models/kobart_model_2.bin'
     }
+    const btn=document.getElementById('btn_loadModel');
+    data={};
+    data['path']=path;
+    const responce = await fetch('/load_model', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    btn.innerText='로딩중...';
+    btn.disabled=True;
+    const result=await responce.json();
+    btn.disabled=False;
     model_loaded=1;
 }
 

@@ -14,9 +14,13 @@ from transformers import BartConfig
 config=BartConfig.from_pretrained("./models/kobart-myTokenizer")
 model = BartForConditionalGeneration(config=config)
 
-# model.load_state_dict(torch.load('./models/kobart-myModel-positive.bin',map_location=torch.device('cpu')))
-# model.eval()
-
+@app.route('/load_model',methods=['POST'])
+def load_model():
+    content=request.get_json(silent=True)
+    path=content['path']
+    model.load_state_dict(torch.load(path,map_location=torch.device('cpu')))
+    model.eval()
+    return 1
 
 @app.route('/quest_gen',methods=['GET','POST'])
 def quest_gen():
