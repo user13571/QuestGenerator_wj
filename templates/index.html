@@ -32,11 +32,11 @@
                 </td>
             </tr>
             <tr>
-                <div id="optSelect">
-                    <td class="opt_n">do_sample</td><td><input class="opt_v" type="text" value="True" style="width: 5em;" disabled></td>
-                    <td class="opt_n">top_k</td><td><input class="opt_v" type="number" style="width: 5em;" value="10"></td>
-                    <td class="opt_n">top_p</td><td><input class="opt_v" type="number" style="width: 5em;" value="0.9"></td>
-                </div>
+                <td id="optSelect" style="width: 35%;">
+                    <span class="opt_n">do_sample</span><span><input class="opt_v" type="text" value="True" style="width: 5em;" disabled></span>&nbsp;
+                    <span class="opt_n">top_k</span> <span><input class="opt_v" type="number" style="width: 5em;" value="25"></span>&nbsp;
+                    <span class="opt_n">top_p</span> <span><input class="opt_v" type="number" style="width: 5em;" value="0.9"></span>&nbsp;
+                </td>
                 <td class="opt_n">repetition_penalty</td><td><input class="opt_v" type="number" style="width: 5em;" value="1.1"></td>
                 <td class="opt_n">no_repeat_ngram_size</td><td><input class="opt_v" type="number" style="width: 5em;" value="3"></td>
                 <td class="opt_n">temperature</td><td><input class="opt_v" type="number" style="width: 5em;" value="1.1"></td>
@@ -47,8 +47,8 @@
             <tr>
                 <td>모델 종류 선택</td>
                 <td><select id="type_model" class="type" name="opt_model" class="w-100">
-                    <option value="model_1">기본</option>
-                    <option value="model_2">긍정</option>
+                    <option value="model_2" default>긍정</option>
+                    <option value="model_1">그냥</option>
                 </select></td>
                 <td><button id="btn_loadModel" onclick="loadModel()">로드하기</button></td>
                 <td>퀘스트 종류 선택</td>

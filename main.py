@@ -14,16 +14,19 @@ from transformers import BartConfig
 config=BartConfig.from_pretrained("./models/kobart-myTokenizer")
 model = BartForConditionalGeneration(config=config)
 
-@app.route('/load_model',methods=['POST'])
+@app.route('/load_model',methods=['POST','GET'])
 def load_model():
-    content=request.get_json(silent=True)
-    path=content['path']
-    model.load_state_dict(torch.load(path,map_location=torch.device('cpu')))
-    model.eval()
-    return 1
+    if request.method=='POST':
+        content=request.get_json(silent=True)
+        path=content['path']
+        global model
+        model.load_state_dict(torch.load(path,map_location=torch.device('cpu')))
+        model.eval()
+        return "success"
 
 @app.route('/quest_gen',methods=['GET','POST'])
 def quest_gen():
+    global tok, model
     if request.method=='POST':
         content=request.get_json(silent=True)
         place=content['keywords']
@@ -35,7 +38,7 @@ def quest_gen():
         print(sent)
         
         input_ids=tok([sent],return_tensors='pt')['input_ids']
-        sent=tok.batch_decode(style_model.generate(input_ids, do_sample=True, top_p=0.6, max_length=1024),skip_special_tokens=True)[0]
+        sent=tok.batch_decode(model.generate(input_ids, do_sample=True, top_p=0.6, max_length=1024),skip_special_tokens=True)[0]
         print(sent)
         data={
             'sentence':sent,
@@ -54,30 +57,37 @@ def quest_gen_web():
     if request.method=='POST':
         content=request.get_json(silent=True)
         input_sentence=content['input_sentence']
+        print(input_sentence)
         sent=sentence_generate(input_sentence, content)
         return sent
 
-def sentence_generate(sent, content){
+def sentence_generate(sent, content):
+    global tok, model
     input_ids=tok(['[BOS] '+sent+' [EOS]'],return_tensors='pt')['input_ids']
     opt_int=['num_return_sequences','num_beams','no_repeat_ngam_size','top_k','min_length']
-    opt_float=['','','']
+    opt_float=['temperature','repetition_penalty','top_p']
     opt_bool=['do_sample']
-    opt_str=['']
-    optionList={}
+    opt_str=[]
+    optionList={'max_length':1024}
     for k,v in content.items():
+        print(k)
         if k in opt_int:
             optionList[k]=int(v)
         elif k in opt_bool:
-            optionList[k]=bool(v)
+            print(k+v)
+            if v=="True":
+                optionList[k]=True
+            else:
+                optionList[k]=False
         elif k in opt_str:
             optionList[k]=str(v)
-        else:
-            optionList[k]=v
+        elif k in opt_float:
+            optionList[k]=float(v)
     gen=model.generate(input_ids, **optionList)
     sent=tok.batch_decode(gen,skip_special_tokens=True)
     print(sent)
-    return sent
-}
+    return sent[0]
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port = 5000)

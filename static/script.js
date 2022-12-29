@@ -1,16 +1,17 @@
 const decodeSelect = (target) => {
     let opt1=document.getElementById("optSelect");
-    if (target.value==="opt_greedy"){
-        opt1.innerHTML='<td class="opt_n">do_sample</td><td><input style="width: 5em;" class="opt_v" type="text" value="" placeholder="False" disabled></td>';
+    console.log(target.value);
+    if (target.value==="opt_1_greedy"){
+        opt1.innerHTML='<span class="opt_n">do_sample</span><span><input style="width: 5em;" class="opt_v" type="text" value="" placeholder="False" disabled></span>&nbsp;';
     }
-    else if (target.value==="opt_beam"){
-        opt1.innerHTML= '<td class="opt_n">do_sample</td><td><input type="text" placeholder="False" value="" class="opt_v" style="width: 5em;" disabled></td>\
-<td class="opt_n">num_beams</td><td><input type="number" class="opt_v"  style="width: 5em;" value="3"></td>';
+    else if (target.value==="opt_2_beam"){
+        opt1.innerHTML= '<span class="opt_n">do_sample</span><span><input type="text" placeholder="False" value="" class="opt_v" style="width: 5em;" disabled></span>&nbsp;\
+<span class="opt_n">num_beams</span><span><input type="number" class="opt_v"  style="width: 5em;" value="3"></span>&nbsp;';
     }
     else{
-        opt1.innerHTML= '<td class="opt_n">do_sample</td><td><input class="opt_v" type="text" value="True" style="width: 5em;" disabled></td>\
-<td class="opt_n">top_k</td><td><input class="opt_v" type="number" style="width: 5em;" value="10"></td>\
-<td class="opt_n">top_p</td><td><input class="opt_v" type="number" style="width: 5em;" value="0.9"></td>';
+        opt1.innerHTML= '<span class="opt_n">do_sample</span><span><input class="opt_v" type="text" value="True" style="width: 5em;" disabled></span>&nbsp;\
+<span class="opt_n">top_k</span><span><input class="opt_v" type="number" style="width: 5em;" value="25"></span>&nbsp;\
+<span class="opt_n">top_p</span><span><input class="opt_v" type="number" style="width: 5em;" value="0.9"></span>&nbsp;';
     }
 }
 
@@ -19,20 +20,21 @@ const getOptionVal = () => {
     let opt_name=document.getElementsByClassName("opt_n");
     let opt_val=document.getElementsByClassName("opt_v");
     for (let i=0; i<opt_name.length ; i++){
-        optionList[opt_name[i]]=opt_val[i];
+        console.log((opt_name[i].innerText)+opt_val[i].value);
+        optionList[opt_name[i].innerText]=opt_val[i].value;
     }
     return optionList;
 }
 
 model_loaded=0;
 async function loadModel() {
-    let model=documents.getElementById("type_model");
+    let model=document.getElementById("type_model");
     let path=''
     if (model.value==="model_1") {
         path='./models/kobart_model_1.bin'
     }
     else if (model.value=="model_2"){
-        path='./models/kobart_model_2.bin'
+        path='./models/kobart_model_2_positive.bin'
     }
     const btn=document.getElementById('btn_loadModel');
     data={};
@@ -45,9 +47,10 @@ async function loadModel() {
         }
     });
     btn.innerText='로딩중...';
-    btn.disabled=True;
-    const result=await responce.json();
-    btn.disabled=False;
+    btn.disabled=true;
+    const result=await responce.text();
+    btn.disabled=false;
+    btn.innerText='로딩 됨'
     model_loaded=1;
 }
 
@@ -65,11 +68,13 @@ const getTypeVal = () => {
     let o1="";
     let o2="";
     let o3="";
-
+    console.log(place);
     if (place!=""){
         c1=`${place}[PLACE] `;
         o1='[ADNOM] ';
     }
+    console.log(place);
+    
     if (obj!=""){
         c2=`${obj}[OBJECT] `;
         o2='[ADNOM] ';
@@ -81,14 +86,18 @@ const getTypeVal = () => {
 
     let input="";
     if (quest_type.value=="quest_2_free"){
-        o1=o2=o3='[MASK][MASK] ';
+        o1='[MASK][MASK] ';
+        o2='[MASK][MASK] ';
+        o3='[MASK][MASK] ';
     }
     else if (quest_type.value=="quest_2_long"){
-        o1=o2=o3='[MASK][MASK][MASK][MASK] ';
+        o1='[MASK][MASK][MASK][MASK] ';
+        o2='[MASK][MASK][MASK][MASK] ';
+        o3='[MASK][MASK][MASK][MASK] ';
     }
     input=o1+c1+o3+o2+c2+c3;
 
-    sentence=""
+    sentence=input;
     if (style_type.value==="style_2_enfp")
         sentence='[STYLE1] '+input+' [/STYLE]';
     else if (style_type.value==="style_3_oldKing")
@@ -97,6 +106,7 @@ const getTypeVal = () => {
         sentence='[STYLE3] '+input+' [/STYLE]';
     else if (style_type.value==="style_5_old")
         sentence='[STYLE4] '+input+' [/STYLE]';
+    console.log(sentence);
     return sentence;
 }
 
@@ -106,15 +116,17 @@ async function makeSentence(){
     }
     let optionList=getOptionVal();
     let input=getTypeVal();
+    console.log(input);
     optionList['input_sentence']=input;
+    const newSent=document.getElementById('result').insertRow(0);
+    newSent.innerText='생성중...';
     const responce = await fetch('/quest_gen_web', {
         method: 'POST',
         body: JSON.stringify(optionList),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=UTF-8'
         }
     });
-    const result=await responce.json();
-    const newSent=document.getElementById('result').insertRow(0);
-    newSent.innerHTML=result;
+    const result=await responce.text();
+    newSent.innerText=result;
 }
