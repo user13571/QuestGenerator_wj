@@ -36,9 +36,8 @@ https://drive.google.com/drive/folders/1Cf7Fa7CUcEL4BbtH2hTf-Iojyd3kEvst?usp=sha
 ### 6~8월: 하계집중학습
 - Quest Generator 개발 시작
     - 장소, 대상, 행동 등 특정 키워드를 제시하면 그에 맞는 퀘스트 문장을 생성해주는 모델
-- 자연어처리 모델 공부
-    - BERT, GPT, BART, T5 등
 - CBART(Xingwei He, Parallel Refinements for Lexically Constrained Text Generation with BART, 2021 / https://github.com/NLPCode/CBART) 논문 조사 및 영어 모델 fine-tuning
+    - BART: BERT와 GPT2를 합친 딥러닝 모델 (Mike Lewis et al., BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension)
     - 영어 퀘스트 데이터, 영미권 어린이 및 청소년 권장 도서 추출 데이터 이용
     - 뉴스 데이터, 식당 리뷰 데이터 이용한 원 모델보다 더 나은 생성 결과 확인
 - 한국어 모델 훈련
